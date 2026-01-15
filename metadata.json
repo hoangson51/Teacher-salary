@@ -1,0 +1,5 @@
+{
+  "name": "Widget tính lương giáo viên",
+  "description": "A widget to calculate Vietnamese teacher salaries based on coefficients, seniority, and allowances.",
+  "requestFramePermissions": []
+}
