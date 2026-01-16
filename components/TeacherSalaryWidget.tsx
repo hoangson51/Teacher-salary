@@ -32,7 +32,7 @@ const Tooltip: React.FC<{ content: string }> = ({ content }) => (
       <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
       <line x1="12" y1="17" x2="12.01" y2="17"></line>
     </svg>
-    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-center font-normal leading-snug">
+    <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 w-48 p-2 bg-gray-800 text-white text-xs rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 text-left font-normal leading-snug">
       {content}
       <div className="absolute top-full left-1/2 transform -translate-x-1/2 border-4 border-transparent border-t-gray-800"></div>
     </div>
@@ -81,8 +81,25 @@ const TeacherSalaryWidget: React.FC = () => {
     }
   }, [currentCoefficients, stepIndex]);
 
-  // Get valid allowances for current group
-  const currentAllowanceOptions = useMemo(() => (subGroup ? ALLOWANCE_MAPPING[subGroup] : []) || [], [subGroup]);
+  // Get valid allowances for current group, or all if none selected
+  const currentAllowanceOptions = useMemo(() => {
+    if (subGroup) {
+      return ALLOWANCE_MAPPING[subGroup] || [];
+    }
+    // Return unique values from all mappings if no group selected
+    const allValues = new Set<number>();
+    Object.values(ALLOWANCE_MAPPING).forEach(arr => arr.forEach(v => allValues.add(v)));
+    return Array.from(allValues).sort((a, b) => a - b);
+  }, [subGroup]);
+
+  // Determine steps to display
+  const stepsToDisplay = useMemo(() => {
+    if (currentCoefficients.length > 0) {
+      return currentCoefficients.map((_, i) => i + 1);
+    }
+    // Default to 10 steps if no coefficient set is determined yet
+    return Array.from({ length: 10 }, (_, i) => i + 1);
+  }, [currentCoefficients]);
 
   // Calculation function
   const calculateSalary = (coeff: number, seniority: number, allowancePct: number) => {
@@ -134,6 +151,11 @@ const TeacherSalaryWidget: React.FC = () => {
     return { current, future, increase, coefficient, sYears };
   }, [group, rank, stepIndex, allowancePercent, seniorityYears, currentCoefficients]);
 
+  const hasResults = !!results;
+  const safeCurrentTotal = results ? results.current.totalSalary : 0;
+  const safeFutureTotal = results ? results.future.totalSalary : 0;
+  const safeIncrease = results ? results.increase : 0;
+
   return (
     <div className="w-full max-w-[680px] mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 font-sans">
       {/* Header */}
@@ -147,11 +169,11 @@ const TeacherSalaryWidget: React.FC = () => {
       </div>
 
       <div className="p-6 pt-4 space-y-6">
-        {/* Input Section - Refactored to single grid for alignment */}
+        {/* Input Section */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 gap-y-5">
           
           {/* Item 1: Teacher Group (Top Left) */}
-          <div className="order-1">
+          <div>
             <label className="block text-sm font-bold text-gray-800 mb-2">Nhóm giáo viên</label>
             <div className="grid grid-cols-2 gap-2">
               {TEACHER_LEVELS.map((level) => (
@@ -170,25 +192,8 @@ const TeacherSalaryWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Item 2: Seniority (Top Right on Desktop, Position 3 on Mobile) */}
-          <div className="order-3 md:order-2">
-            <label className="flex items-center text-sm font-bold text-gray-800 mb-2">
-              Thâm niên công tác (năm)
-              <Tooltip content="Hưởng phụ cấp từ năm thứ 5 trở đi (1% mỗi năm)" />
-            </label>
-            <input 
-              type="number" 
-              min="0" 
-              max="50"
-              className="w-full p-3 bg-white border border-gray-300 text-gray-900 rounded-lg focus:border-black focus:ring-0 outline-none transition shadow-sm"
-              value={seniorityYears}
-              onChange={(e) => setSeniorityYears(e.target.value)}
-              placeholder="Nhập số năm"
-            />
-          </div>
-
-          {/* Item 3: Rank (Bottom Left on Desktop, Position 2 on Mobile) */}
-          <div className="order-2 md:order-3">
+          {/* Item 2: Rank (Top Right) */}
+          <div>
             <label className="block text-sm font-bold text-gray-800 mb-2">Hạng chức danh</label>
             <div className="flex gap-2">
               {Object.values(Rank).map((r) => (
@@ -207,8 +212,8 @@ const TeacherSalaryWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Item 4: Allowance (Bottom Right on Desktop, Position 4 on Mobile) */}
-          <div className="order-4">
+          {/* Item 3: Allowance (Middle Left - Below Group) */}
+          <div>
             <label className="flex items-center text-sm font-bold text-gray-800 mb-2">
               % Phụ cấp ưu đãi hiện tại
               <Tooltip content="Tùy thuộc vào cấp học và khu vực (30% - 80%)" />
@@ -216,8 +221,7 @@ const TeacherSalaryWidget: React.FC = () => {
             
             {/* Quick Select Chips */}
             <div className="flex flex-wrap gap-2">
-              {currentAllowanceOptions.length > 0 ? (
-                currentAllowanceOptions.map(val => (
+              {currentAllowanceOptions.map(val => (
                 <button
                   key={val}
                   onClick={() => setAllowancePercent(val)}
@@ -229,177 +233,88 @@ const TeacherSalaryWidget: React.FC = () => {
                 >
                   {val}%
                 </button>
-              ))
-            ) : (
-                <div className="text-gray-400 text-sm italic py-2">Vui lòng chọn nhóm giáo viên</div>
-            )}
+              ))}
             </div>
           </div>
-        </div>
 
-        {/* Full width Step section */}
-        <div>
-          <label className="block text-sm font-bold text-gray-800 mb-2">
-            Bậc lương
-          </label>
-          {currentCoefficients.length > 0 ? (
+          {/* Item 4: Step (Middle Right - Below Rank) */}
+          <div>
+            <label className="block text-sm font-bold text-gray-800 mb-2">
+                Bậc lương
+            </label>
             <div className="flex flex-wrap gap-2">
-                {currentCoefficients.map((_, index) => (
-                <button
-                    key={index}
-                    onClick={() => setStepIndex(index)}
-                    className={`w-9 h-9 flex items-center justify-center text-sm rounded-md border font-bold transition shadow-sm ${
-                    stepIndex === index
-                    ? 'bg-primary text-white border-primary'
-                    : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
-                    }`}
-                >
-                    {index + 1}
-                </button>
+                {stepsToDisplay.map((stepLabel, index) => (
+                    <button
+                        key={index}
+                        onClick={() => setStepIndex(index)}
+                        className={`w-9 h-9 flex items-center justify-center text-sm rounded-md border font-bold transition shadow-sm ${
+                        stepIndex === index
+                        ? 'bg-primary text-white border-primary'
+                        : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
+                        }`}
+                    >
+                        {stepLabel}
+                    </button>
                 ))}
             </div>
-          ) : (
-             <div className="text-gray-400 text-sm italic">Vui lòng chọn nhóm giáo viên và hạng chức danh</div>
-          )}
+          </div>
+
+          {/* Item 5: Seniority (Bottom Left - Below Allowance - 1 Column width) */}
+          <div>
+            <label className="flex items-center text-sm font-bold text-gray-800 mb-2">
+              Thâm niên công tác (năm)
+              <Tooltip content="Hưởng phụ cấp từ năm thứ 5 trở đi (1% mỗi năm)" />
+            </label>
+            <input 
+              type="number" 
+              min="0" 
+              max="50"
+              className="w-full p-3 bg-white border border-gray-300 text-gray-900 rounded-lg focus:border-black focus:ring-0 outline-none transition shadow-sm"
+              value={seniorityYears}
+              onChange={(e) => setSeniorityYears(e.target.value)}
+              placeholder="Nhập số năm"
+            />
+          </div>
         </div>
 
-        {/* Results Section */}
-        {results && (
-        <div className="bg-[#F7F7F7] rounded-xl p-5 border border-gray-300 relative overflow-hidden mt-2">
-          <div className="absolute top-0 left-0 w-2 h-full bg-primary"></div>
+        {/* Results Section - Always Rendered but content hidden if no results */}
+        <div className="mt-4">
           
-          <h3 className="font-serif font-bold text-gray-800 text-lg mb-4 border-b border-gray-300 pb-2">
-            Chi tiết lương thực nhận
+          <h3 className="font-serif font-bold text-gray-800 text-lg mb-4 pb-2 border-b border-gray-200">
+            Thu nhập
           </h3>
 
-          {/* Mobile View: Two Stacked Cards (Current & New) */}
-          <div className="sm:hidden space-y-4">
-            {/* Card 1: Current Salary */}
-            <div className="bg-white rounded-lg p-3 border border-gray-200 shadow-sm">
-               <div className="text-gray-600 font-bold text-sm uppercase mb-3 pb-1 border-b">Hiện tại</div>
-               <div className="space-y-2 text-sm text-gray-800">
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">Lương hệ số <span className="text-xs">({results.coefficient.toFixed(2)})</span></span>
-                     <span className="font-bold">{formatCurrency(results.current.salaryFromCoeff)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">PC Thâm niên <span className="text-xs">({results.sYears >= 5 ? results.sYears : 0}%)</span></span>
-                     <span className="font-bold text-green-700">{formatCurrency(results.current.seniorityAmt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">PC Ưu đãi <span className="text-xs">({allowancePercent}%)</span></span>
-                     <span className="font-bold text-green-700">{formatCurrency(results.current.allowanceAmt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">BHXH <span className="text-xs">(10.5%)</span></span>
-                     <span className="font-bold text-red-600">-{formatCurrency(results.current.insuranceAmt)}</span>
-                  </div>
-                  <div className="pt-2 border-t mt-2 flex justify-between items-center">
-                     <span className="font-serif font-bold text-gray-900">Tổng nhận</span>
-                     <span className="font-bold text-xl text-gray-800">{formatCurrency(results.current.totalSalary)}</span>
-                  </div>
-               </div>
-            </div>
-
-            {/* Card 2: New Salary */}
-            <div className="bg-white rounded-lg p-3 border border-red-100 shadow-sm">
-               <div className="text-primary font-bold text-sm uppercase mb-3 pb-1 border-b border-red-200">Mới (Dự kiến)</div>
-               <div className="space-y-2 text-sm text-gray-800">
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">Lương hệ số <span className="text-xs">({results.coefficient.toFixed(2)})</span></span>
-                     <span className="font-bold text-primary">{formatCurrency(results.future.salaryFromCoeff)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">PC Thâm niên <span className="text-xs">({results.sYears >= 5 ? results.sYears : 0}%)</span></span>
-                     <span className="font-bold text-green-700">{formatCurrency(results.future.seniorityAmt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">PC Ưu đãi <span className="text-xs">({(allowancePercent || 0) + 10}%)</span></span>
-                     <span className="font-bold text-green-700">{formatCurrency(results.future.allowanceAmt)}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                     <span className="text-gray-600">BHXH <span className="text-xs">(10.5%)</span></span>
-                     <span className="font-bold text-red-600">-{formatCurrency(results.future.insuranceAmt)}</span>
-                  </div>
-                  <div className="pt-2 border-t border-red-200 mt-2">
-                     <div className="flex justify-between items-center">
-                        <span className="font-serif font-bold text-gray-900">Tổng nhận</span>
-                        <span className="font-bold text-xl text-primary">{formatCurrency(results.future.totalSalary)}</span>
-                     </div>
-                     <div className="text-right text-xs font-bold text-green-600 mt-1">
-                        (+{formatCurrency(results.increase)})
-                     </div>
-                  </div>
-               </div>
-            </div>
-          </div>
-
-          {/* Desktop View: Table (Visible on sm and up) */}
-          <div className="hidden sm:grid grid-cols-[1.5fr,1fr,1fr] gap-x-2 gap-y-3 text-sm text-gray-800 items-center">
-            {/* Header Row */}
-            <div className="font-bold text-gray-500 text-xs uppercase tracking-wider">Khoản mục</div>
-            <div className="font-bold text-gray-700 text-right">Hiện tại</div>
-            <div className="font-bold text-primary text-right">Mới (Dự kiến)</div>
+          {/* Table-like Layout for both Desktop/Mobile */}
+          <div className="grid grid-cols-[1.5fr,1fr,1fr] gap-x-2 gap-y-2 items-start">
+            {/* Headers */}
+            <div className="text-gray-500 text-xs font-bold uppercase tracking-wider self-center">KHOẢN MỤC</div>
+            <div className="text-gray-600 text-xs font-bold text-right self-center">Hiện tại</div>
+            <div className="text-primary text-xs font-bold text-right self-center">Mới (Dự kiến)</div>
             
-            {/* Lương theo hệ số */}
-            <div className="col-span-3 h-px bg-gray-200 my-1"></div>
-            <div>
-              Lương theo hệ số <span className="text-xs text-gray-500 block sm:inline">(2.34 x {results.coefficient.toFixed(2)})</span>
-            </div>
-            <div className="text-right font-bold">{formatCurrency(results.current.salaryFromCoeff)}</div>
-            <div className="text-right font-bold text-primary">{formatCurrency(results.future.salaryFromCoeff)}</div>
+            {/* Divider */}
+            <div className="col-span-3 border-b border-gray-200 my-2"></div>
 
-            {/* Phụ cấp thâm niên */}
-            <div>
-              + Phụ cấp thâm niên <span className="text-xs text-gray-500 block sm:inline">{results.sYears >= 5 ? `(${results.sYears}%)` : '(0%)'}</span>
-            </div>
-            <div className="text-right font-bold text-green-700">{formatCurrency(results.current.seniorityAmt)}</div>
-            <div className="text-right font-bold text-green-700">{formatCurrency(results.future.seniorityAmt)}</div>
-
-            {/* Phụ cấp ưu đãi */}
-            <div>
-              + Phụ cấp ưu đãi
-            </div>
-            <div className="text-right font-bold text-green-700">
-              {formatCurrency(results.current.allowanceAmt)}
-              <span className="text-xs text-gray-500 block">({allowancePercent}%)</span>
-            </div>
-            <div className="text-right font-bold text-green-700">
-               {formatCurrency(results.future.allowanceAmt)}
-               <span className="text-xs text-gray-500 block">({(allowancePercent || 0) + 10}%)</span>
-            </div>
-
-             {/* Bảo hiểm */}
-            <div>
-              - Bảo hiểm xã hội <span className="text-xs text-gray-500 block sm:inline">(10.5%)</span>
-            </div>
-            <div className="text-right font-bold text-red-600">-{formatCurrency(results.current.insuranceAmt)}</div>
-            <div className="text-right font-bold text-red-600">-{formatCurrency(results.future.insuranceAmt)}</div>
-            
             {/* Totals Row */}
-            <div className="col-span-3 h-px bg-gray-400 mt-2 mb-2"></div>
-
-            <div className="font-serif font-bold text-lg text-gray-900 self-baseline">
-              Tổng thực nhận:
+            <div className="font-sans font-bold text-sm text-gray-900 mt-1.5">
+              TỔNG
             </div>
 
-            <div className="text-right flex flex-col items-end self-baseline">
+            <div className={`text-right ${hasResults ? '' : 'invisible'}`}>
                <div className="font-sans font-bold text-2xl text-gray-800 leading-none">
-                {formatCurrency(results.current.totalSalary)}
+                {formatCurrency(safeCurrentTotal)}
               </div>
             </div>
 
-            <div className="text-right flex flex-col items-end self-baseline">
+            <div className={`text-right flex flex-col items-end ${hasResults ? '' : 'invisible'}`}>
                <div className="font-sans font-bold text-2xl text-primary leading-none">
-                {formatCurrency(results.future.totalSalary)}
+                {formatCurrency(safeFutureTotal)}
               </div>
               <div className="text-xs font-bold text-green-600 mt-1">
-                 (+{formatCurrency(results.increase)})
+                 (+{formatCurrency(safeIncrease)})
               </div>
             </div>
           </div>
         </div>
-        )}
 
         {/* Footer Notes */}
         <div className="text-xs text-gray-500 text-left italic !mt-2">
