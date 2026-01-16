@@ -182,7 +182,7 @@ const TeacherSalaryWidget: React.FC = () => {
                   onClick={() => handleGroupChange(level)}
                   className={`py-2 px-1 text-sm rounded-lg border font-bold transition shadow-sm ${
                     subGroup === level
-                    ? 'bg-primary text-white border-primary ring-1 ring-primary'
+                    ? 'bg-primary/10 text-primary border-primary'
                     : 'bg-white text-gray-500 border-gray-300 hover:border-primary hover:text-primary'
                   }`}
                 >
@@ -202,7 +202,7 @@ const TeacherSalaryWidget: React.FC = () => {
                   onClick={() => handleRankChange(r)}
                   className={`flex-1 py-2 px-2 text-sm rounded-lg border font-bold transition shadow-sm ${
                     rank === r 
-                    ? 'bg-primary text-white border-primary ring-1 ring-primary' 
+                    ? 'bg-primary/10 text-primary border-primary' 
                     : 'bg-white text-gray-500 border-gray-300 hover:border-primary hover:text-primary'
                   }`}
                 >
@@ -227,7 +227,7 @@ const TeacherSalaryWidget: React.FC = () => {
                   onClick={() => setAllowancePercent(val)}
                   className={`text-sm font-bold py-2 px-4 rounded-lg border transition shadow-sm ${
                     allowancePercent === val
-                    ? 'bg-primary text-white border-primary ring-1 ring-primary'
+                    ? 'bg-primary/10 text-primary border-primary'
                     : 'bg-white text-gray-600 border-gray-300 hover:border-primary hover:text-primary'
                   }`}
                 >
@@ -247,9 +247,9 @@ const TeacherSalaryWidget: React.FC = () => {
                     <button
                         key={index}
                         onClick={() => setStepIndex(index)}
-                        className={`w-9 h-9 flex items-center justify-center text-sm rounded-md border font-bold transition shadow-sm ${
+                        className={`py-2 px-4 text-sm rounded-lg border font-bold transition shadow-sm min-w-[3rem] ${
                         stepIndex === index
-                        ? 'bg-primary text-white border-primary'
+                        ? 'bg-primary/10 text-primary border-primary'
                         : 'bg-white text-gray-600 border-gray-300 hover:border-primary hover:text-primary'
                         }`}
                     >
@@ -259,7 +259,7 @@ const TeacherSalaryWidget: React.FC = () => {
             </div>
           </div>
 
-          {/* Item 5: Seniority (Bottom Left - Below Allowance - 1 Column width) */}
+          {/* Item 5: Seniority (Bottom Full Width) */}
           <div>
             <label className="flex items-center text-sm font-bold text-gray-800 mb-1.5">
               Thâm niên công tác (năm)
@@ -277,47 +277,46 @@ const TeacherSalaryWidget: React.FC = () => {
           </div>
         </div>
 
-        {/* Results Section - Always Rendered but content hidden if no results */}
-        <div className="mt-2">
-          
-          <h3 className="font-serif font-bold text-gray-800 text-lg mb-2 pb-2 border-b border-gray-200">
+        {/* Results Section */}
+        <div className="mt-4 pt-2 border-t border-gray-100">
+          <h3 className="font-serif font-bold text-gray-800 text-lg mb-2">
             Thu nhập
           </h3>
 
-          {/* Table-like Layout for both Desktop/Mobile */}
-          <div className="grid grid-cols-[1.5fr,1fr,1fr] gap-x-2 gap-y-2 items-start">
-            {/* Headers */}
-            <div className="text-gray-500 text-xs font-bold uppercase tracking-wider self-center">KHOẢN MỤC</div>
-            <div className="text-gray-600 text-xs font-bold text-right self-center">Hiện tại</div>
-            <div className="text-primary text-xs font-bold text-right self-center">Mới (Dự kiến)</div>
-            
-            {/* Divider */}
-            <div className="col-span-3 border-b border-gray-200 my-1"></div>
-
-            {/* Totals Row */}
-            <div className="font-sans font-bold text-sm text-gray-900 mt-1.5">
-              TỔNG
-            </div>
-
-            <div className={`text-right ${hasResults ? '' : 'invisible'}`}>
-               <div className="font-sans font-bold text-2xl text-gray-800 leading-none">
-                {formatCurrency(safeCurrentTotal)}
-              </div>
-            </div>
-
-            <div className={`text-right flex flex-col items-end ${hasResults ? '' : 'invisible'}`}>
-               <div className="font-sans font-bold text-2xl text-primary leading-none">
-                {formatCurrency(safeFutureTotal)}
-              </div>
-              <div className="text-xs font-bold text-green-600 mt-1">
-                 (+{formatCurrency(safeIncrease)})
-              </div>
-            </div>
+          <div className="grid grid-cols-[auto_1fr_1fr] gap-x-2 sm:gap-x-4 items-baseline">
+             {/* Header Row */}
+             <div className="text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider pb-1 whitespace-nowrap">
+                KHOẢN MỤC
+             </div>
+             <div className="text-gray-600 text-[10px] sm:text-xs font-bold text-right pb-1">
+                Hiện tại
+             </div>
+             <div className="text-primary text-[10px] sm:text-xs font-bold text-right pb-1">
+                Mới (Dự kiến)
+             </div>
+             
+             {/* Values Row */}
+             <div className="font-sans font-bold text-sm sm:text-base text-gray-900 py-2 whitespace-nowrap">
+               TỔNG
+             </div>
+             <div className="text-right py-2">
+               <div className={`font-sans font-bold text-lg sm:text-2xl text-gray-800 leading-none ${hasResults ? '' : 'invisible'}`}>
+                 {formatCurrency(safeCurrentTotal)}
+               </div>
+             </div>
+             <div className="text-right py-2 flex flex-col items-end">
+               <div className={`font-sans font-bold text-lg sm:text-2xl text-primary leading-none ${hasResults ? '' : 'invisible'}`}>
+                 {formatCurrency(safeFutureTotal)}
+               </div>
+               <div className={`text-[10px] sm:text-xs font-bold text-green-600 mt-1 ${hasResults ? '' : 'invisible'}`}>
+                  (+{formatCurrency(safeIncrease)})
+               </div>
+             </div>
           </div>
         </div>
 
         {/* Footer Notes */}
-        <div className="text-xs text-gray-500 text-left italic !mt-2">
+        <div className="text-xs text-gray-500 text-left italic !mt-4">
           * Công cụ tính dựa trên công thức: Lương = (2.34 x Hệ số) + Phụ cấp thâm niên + Phụ cấp ưu đãi - Bảo hiểm.<br/>
           Số liệu làm tròn đến hàng đơn vị. Kết quả mang tính chất tham khảo.
         </div>
