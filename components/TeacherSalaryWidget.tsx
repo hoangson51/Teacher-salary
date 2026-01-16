@@ -159,22 +159,22 @@ const TeacherSalaryWidget: React.FC = () => {
   return (
     <div className="w-full max-w-[680px] mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 font-sans">
       {/* Header */}
-      <div className="px-6 pt-6 pb-0 text-left">
-        <h2 className="text-primary font-serif text-2xl font-bold">
+      <div className="px-5 pt-5 pb-0 text-left">
+        <h2 className="text-gray-900 font-serif text-xl font-bold">
           Lương giáo viên trước và sau thay đổi
         </h2>
-        <p className="text-gray-500 text-sm mt-2 italic">
+        <p className="text-gray-500 text-sm mt-1 italic">
           Vui lòng nhập đầy đủ thông tin để hiển thị kết quả
         </p>
       </div>
 
-      <div className="p-6 pt-4 space-y-6">
+      <div className="p-5 pt-3 space-y-4">
         {/* Input Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 gap-y-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 gap-y-3">
           
           {/* Item 1: Teacher Group (Top Left) */}
           <div>
-            <label className="block text-sm font-bold text-gray-800 mb-2">Nhóm giáo viên</label>
+            <label className="block text-sm font-bold text-gray-800 mb-1.5">Nhóm giáo viên</label>
             <div className="grid grid-cols-2 gap-2">
               {TEACHER_LEVELS.map((level) => (
                 <button
@@ -183,7 +183,7 @@ const TeacherSalaryWidget: React.FC = () => {
                   className={`py-2 px-1 text-sm rounded-lg border font-bold transition shadow-sm ${
                     subGroup === level
                     ? 'bg-primary text-white border-primary ring-1 ring-primary'
-                    : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'
+                    : 'bg-white text-gray-500 border-gray-300 hover:border-primary hover:text-primary'
                   }`}
                 >
                   {level}
@@ -194,7 +194,7 @@ const TeacherSalaryWidget: React.FC = () => {
 
           {/* Item 2: Rank (Top Right) */}
           <div>
-            <label className="block text-sm font-bold text-gray-800 mb-2">Hạng chức danh</label>
+            <label className="block text-sm font-bold text-gray-800 mb-1.5">Hạng chức danh</label>
             <div className="flex gap-2">
               {Object.values(Rank).map((r) => (
                 <button
@@ -203,7 +203,7 @@ const TeacherSalaryWidget: React.FC = () => {
                   className={`flex-1 py-2 px-2 text-sm rounded-lg border font-bold transition shadow-sm ${
                     rank === r 
                     ? 'bg-primary text-white border-primary ring-1 ring-primary' 
-                    : 'bg-white text-gray-500 border-gray-300 hover:bg-gray-50'
+                    : 'bg-white text-gray-500 border-gray-300 hover:border-primary hover:text-primary'
                   }`}
                 >
                   {r}
@@ -214,7 +214,7 @@ const TeacherSalaryWidget: React.FC = () => {
 
           {/* Item 3: Allowance (Middle Left - Below Group) */}
           <div>
-            <label className="flex items-center text-sm font-bold text-gray-800 mb-2">
+            <label className="flex items-center text-sm font-bold text-gray-800 mb-1.5">
               % Phụ cấp ưu đãi hiện tại
               <Tooltip content="Tùy thuộc vào cấp học và khu vực (30% - 80%)" />
             </label>
@@ -239,7 +239,7 @@ const TeacherSalaryWidget: React.FC = () => {
 
           {/* Item 4: Step (Middle Right - Below Rank) */}
           <div>
-            <label className="block text-sm font-bold text-gray-800 mb-2">
+            <label className="block text-sm font-bold text-gray-800 mb-1.5">
                 Bậc lương
             </label>
             <div className="flex flex-wrap gap-2">
@@ -250,7 +250,7 @@ const TeacherSalaryWidget: React.FC = () => {
                         className={`w-9 h-9 flex items-center justify-center text-sm rounded-md border font-bold transition shadow-sm ${
                         stepIndex === index
                         ? 'bg-primary text-white border-primary'
-                        : 'bg-white text-gray-600 border-gray-300 hover:border-primary'
+                        : 'bg-white text-gray-600 border-gray-300 hover:border-primary hover:text-primary'
                         }`}
                     >
                         {stepLabel}
@@ -261,7 +261,7 @@ const TeacherSalaryWidget: React.FC = () => {
 
           {/* Item 5: Seniority (Bottom Left - Below Allowance - 1 Column width) */}
           <div>
-            <label className="flex items-center text-sm font-bold text-gray-800 mb-2">
+            <label className="flex items-center text-sm font-bold text-gray-800 mb-1.5">
               Thâm niên công tác (năm)
               <Tooltip content="Hưởng phụ cấp từ năm thứ 5 trở đi (1% mỗi năm)" />
             </label>
@@ -269,7 +269,7 @@ const TeacherSalaryWidget: React.FC = () => {
               type="number" 
               min="0" 
               max="50"
-              className="w-full p-3 bg-white border border-gray-300 text-gray-900 rounded-lg focus:border-black focus:ring-0 outline-none transition shadow-sm"
+              className="w-full p-2.5 bg-white border border-gray-300 text-gray-900 rounded-lg focus:border-black focus:ring-0 outline-none transition shadow-sm"
               value={seniorityYears}
               onChange={(e) => setSeniorityYears(e.target.value)}
               placeholder="Nhập số năm"
@@ -278,9 +278,9 @@ const TeacherSalaryWidget: React.FC = () => {
         </div>
 
         {/* Results Section - Always Rendered but content hidden if no results */}
-        <div className="mt-4">
+        <div className="mt-2">
           
-          <h3 className="font-serif font-bold text-gray-800 text-lg mb-4 pb-2 border-b border-gray-200">
+          <h3 className="font-serif font-bold text-gray-800 text-lg mb-2 pb-2 border-b border-gray-200">
             Thu nhập
           </h3>
 
@@ -292,7 +292,7 @@ const TeacherSalaryWidget: React.FC = () => {
             <div className="text-primary text-xs font-bold text-right self-center">Mới (Dự kiến)</div>
             
             {/* Divider */}
-            <div className="col-span-3 border-b border-gray-200 my-2"></div>
+            <div className="col-span-3 border-b border-gray-200 my-1"></div>
 
             {/* Totals Row */}
             <div className="font-sans font-bold text-sm text-gray-900 mt-1.5">
