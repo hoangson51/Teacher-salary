@@ -25,7 +25,7 @@ const App: React.FC = () => {
   // If in embed mode, only render the widget centered
   if (isEmbed) {
     return (
-      <div className="min-h-screen p-4 flex items-start justify-center bg-transparent">
+      <div className="min-h-screen p-0 bg-transparent">
         <TeacherSalaryWidget />
       </div>
     );
@@ -33,7 +33,7 @@ const App: React.FC = () => {
 
   // Default view with Generator sidebar
   return (
-    <div className="min-h-screen bg-gray-50 py-10 px-4 font-sans">
+    <div className="min-h-screen bg-gray-50 py-10 px-0 font-sans">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8 items-start">
             {/* Sidebar Generator - Sticky on Desktop */}
             <div className="w-full lg:w-4/12 lg:sticky lg:top-10">
