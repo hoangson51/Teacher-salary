@@ -44,7 +44,7 @@ const EmbedGenerator: React.FC = () => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-xl shadow-lg border border-gray-200 font-sans h-full">
+    <div className="bg-white p-6 rounded-xl shadow-none border border-gray-200 font-sans h-full">
       <div className="mb-6">
         <h2 className="text-xl font-bold font-serif text-gray-900">Tạo mã nhúng (Embed)</h2>
         <p className="text-sm text-gray-500 mt-1">Tùy chỉnh nội dung và lấy mã nhúng hoặc link trực tiếp</p>

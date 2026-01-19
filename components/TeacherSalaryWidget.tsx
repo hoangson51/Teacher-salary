@@ -157,7 +157,7 @@ const TeacherSalaryWidget: React.FC = () => {
   const safeIncrease = results ? results.increase : 0;
 
   return (
-    <div className="w-full max-w-[680px] mx-auto bg-white rounded-xl shadow-xl overflow-hidden border border-gray-200 font-sans">
+    <div className="w-full mx-auto bg-white rounded-xl shadow-none overflow-hidden border border-gray-200 font-sans">
       {/* Header */}
       <div className="px-5 pt-5 pb-0 text-left">
         <h2 className="text-gray-900 font-serif text-xl font-bold">
