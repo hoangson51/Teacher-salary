@@ -285,13 +285,13 @@ const TeacherSalaryWidget: React.FC = () => {
 
           <div className="grid grid-cols-[auto_1fr_1fr] gap-x-2 sm:gap-x-4 items-baseline">
              {/* Header Row */}
-             <div className="text-gray-500 text-[10px] sm:text-xs font-bold uppercase tracking-wider pb-1 whitespace-nowrap">
+             <div className="text-gray-500 text-sm sm:text-base font-bold uppercase tracking-wider pb-1 whitespace-nowrap">
                 KHOẢN MỤC
              </div>
-             <div className="text-gray-600 text-[10px] sm:text-xs font-bold text-right pb-1">
+             <div className="text-gray-600 text-sm sm:text-base font-bold text-right pb-1">
                 Hiện tại
              </div>
-             <div className="text-primary text-[10px] sm:text-xs font-bold text-right pb-1">
+             <div className="text-primary text-sm sm:text-base font-bold text-right pb-1">
                 Mới (Dự kiến)
              </div>
              
@@ -308,7 +308,7 @@ const TeacherSalaryWidget: React.FC = () => {
                <div className={`font-sans font-bold text-lg sm:text-2xl text-primary leading-none ${hasResults ? '' : 'invisible'}`}>
                  {formatCurrency(safeFutureTotal)}
                </div>
-               <div className={`text-[10px] sm:text-xs font-bold text-green-600 mt-1 ${hasResults ? '' : 'invisible'}`}>
+               <div className={`text-sm sm:text-base font-bold text-green-600 mt-1 ${hasResults ? '' : 'invisible'}`}>
                   (+{formatCurrency(safeIncrease)})
                </div>
              </div>
